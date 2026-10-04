@@ -6,8 +6,34 @@ let currentIndex = 0;
 let score = 0;
 let streak = 0;
 let testBestStreak = 0;
-let bestStreak = Number(localStorage.getItem("de-quiz-best-streak") || 0);
+let bestStreak = Number(storageGet("de-quiz-best-streak") || 0);
 let answered = false;
+let currentLesson = null; // null = random quiz
+let mistakes = [];
+
+function storageGet(key) {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function storageSet(key, value) {
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    // Storage can be unavailable (private mode); scores just won't persist.
+  }
+}
+
+function getLessonBest() {
+  try {
+    return JSON.parse(storageGet("de-quiz-lesson-best") || "{}");
+  } catch {
+    return {};
+  }
+}
 
 function shuffle(arr) {
   const a = arr.slice();
@@ -18,40 +44,186 @@ function shuffle(arr) {
   return a;
 }
 
-function normalize(str) {
-  return str
-    .trim()
-    .toLowerCase()
+function normalize(str, keepCase = false) {
+  const s = keepCase ? str.trim() : str.trim().toLowerCase();
+  return s
     .replace(/ß/g, "ss")
     .replace(/ä/g, "a")
     .replace(/ö/g, "o")
     .replace(/ü/g, "u")
+    .replace(/Ä/g, "A")
+    .replace(/Ö/g, "O")
+    .replace(/Ü/g, "U")
     .replace(/[.,!?]/g, "")
-    .replace(/\s+/g, " ");
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
+function lowerFirst(s) {
+  return s.charAt(0).toLowerCase() + s.slice(1);
+}
+
+// caseMode: undefined = ignore case, "exact" = case matters (sie ≠ Sie),
+// "sentence" = case matters except for the first letter of the sentence.
 function isCorrectAnswer(question, given) {
   const candidates = [question.answer, ...(question.altAnswers || [])];
-  const normGiven = normalize(given);
-  return candidates.some((c) => normalize(c) === normGiven);
+  const norm = (s) => {
+    if (question.caseMode === "exact") return normalize(s, true);
+    if (question.caseMode === "sentence") return lowerFirst(normalize(s, true));
+    return normalize(s);
+  };
+  const normGiven = norm(given);
+  return candidates.some((c) => norm(c) === normGiven);
+}
+
+function lessonQuestions(lesson) {
+  return lesson.items.map((item) => {
+    let caseMode;
+    if (lesson.translate) caseMode = "sentence";
+    else if (item.options || !/(^|[.!?]\s+)___/.test(item.q)) caseMode = "exact";
+    return {
+      category: lesson.title,
+      type: item.options ? "mc" : "type",
+      hint: lesson.hint || (item.options ? "Choose the correct answer" : "Fill in the missing word"),
+      prompt: item.q,
+      promptHtml:
+        formatMarked(item.q, "strong") +
+        (item.cue ? ` <span class="cue">(${escapeHtml(item.cue)})</span>` : ""),
+      answer: item.a,
+      altAnswers: item.alt,
+      options: item.options,
+      keepOrder: true,
+      sentence: item.s,
+      why: item.why,
+      caseMode,
+    };
+  });
+}
+
+function show(html) {
+  appEl.innerHTML = html;
+  window.scrollTo(0, 0);
+  const menuBtn = document.getElementById("menuBtn");
+  if (menuBtn) menuBtn.addEventListener("click", renderHome);
 }
 
 function startQuiz() {
+  currentLesson = null;
   quizQuestions = shuffle(QUESTIONS).slice(0, QUESTIONS_PER_TEST);
+  resetProgress();
+  renderQuestion();
+}
+
+function startLesson(lesson) {
+  currentLesson = lesson;
+  quizQuestions = lessonQuestions(lesson);
+  resetProgress();
+  renderQuestion();
+}
+
+function resetProgress() {
   currentIndex = 0;
   score = 0;
   streak = 0;
   testBestStreak = 0;
-  renderQuestion();
+  mistakes = [];
 }
 
 function renderHeader() {
   return `
     <header>
       <h1>Personalpronomen 🇩🇪</h1>
-      <p>Nominativ · Akkusativ · Dativ · Genitiv · Futur I — ${QUESTIONS.length.toLocaleString()} questions</p>
+      <p>Nominativ · Akkusativ · Dativ · Genitiv · Possessiv · Futur I</p>
     </header>
   `;
+}
+
+function renderFooter() {
+  return `<footer>Made to help learn German, one word at a time.</footer>`;
+}
+
+function renderNav() {
+  return `<button class="back-link" id="menuBtn">← Menu</button>`;
+}
+
+function renderHome() {
+  currentLesson = null;
+  const best = getLessonBest();
+  const groups = [];
+  LESSONS.forEach((lesson) => {
+    let group = groups.find((g) => g.name === lesson.group);
+    if (!group) groups.push((group = { name: lesson.group, lessons: [] }));
+    group.lessons.push(lesson);
+  });
+
+  show(`
+    ${renderHeader()}
+    <div class="card menu-card">
+      <h2>Lessons</h2>
+      <p class="muted">The practice rounds from our sessions, with the correct sentence and an explanation after every answer.</p>
+      <button class="link-btn" id="cheatBtn">📋 Cheat sheet</button>
+      ${groups
+        .map(
+          (g) => `
+        <h3 class="group-title">${escapeHtml(g.name)}</h3>
+        <div class="lesson-list">
+          ${g.lessons
+            .map((l) => {
+              const b = best[l.id];
+              const meta = b != null ? `Best ${b} / ${l.items.length}` : `${l.items.length} questions`;
+              return `
+                <button class="lesson-btn" data-id="${l.id}">
+                  <span>${escapeHtml(l.title)}</span>
+                  <span class="lesson-meta">${meta}</span>
+                </button>`;
+            })
+            .join("")}
+        </div>`
+        )
+        .join("")}
+    </div>
+    <div class="card menu-card">
+      <h2>Random quiz</h2>
+      <p class="muted">${QUESTIONS_PER_TEST} random questions from ${QUESTIONS.length.toLocaleString()} generated sentences, covering every case plus Futur I.</p>
+      <button class="restart-btn" id="randomBtn">Start random quiz</button>
+    </div>
+    ${renderFooter()}
+  `);
+
+  document.getElementById("randomBtn").addEventListener("click", startQuiz);
+  document.getElementById("cheatBtn").addEventListener("click", renderCheatSheet);
+  document.querySelectorAll(".lesson-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      renderLessonIntro(LESSONS.find((l) => l.id === btn.dataset.id));
+    });
+  });
+}
+
+function renderLessonIntro(lesson) {
+  show(`
+    ${renderHeader()}
+    ${renderNav()}
+    <div class="card">
+      <span class="category-tag">${escapeHtml(lesson.group)}</span>
+      <h2 class="lesson-heading">${escapeHtml(lesson.title)}</h2>
+      <div class="tip">${lesson.tip}</div>
+      <button class="restart-btn" id="startBtn">Start · ${lesson.items.length} questions</button>
+    </div>
+    ${renderFooter()}
+  `);
+  document.getElementById("startBtn").addEventListener("click", () => startLesson(lesson));
+}
+
+function renderCheatSheet() {
+  show(`
+    ${renderHeader()}
+    ${renderNav()}
+    <div class="card">
+      <h2 class="lesson-heading">Cheat sheet</h2>
+      <div class="tip">${CHEAT_SHEET}</div>
+    </div>
+    ${renderFooter()}
+  `);
 }
 
 function renderStats() {
@@ -78,7 +250,7 @@ function renderQuestion() {
 
   let bodyHtml;
   if (q.type === "mc") {
-    const opts = shuffle(q.options);
+    const opts = q.keepOrder ? q.options : shuffle(q.options);
     bodyHtml = `
       <div class="options">
         ${opts
@@ -94,7 +266,7 @@ function renderQuestion() {
   } else {
     bodyHtml = `
       <form class="type-form" id="typeForm" autocomplete="off">
-        <input type="text" id="typeInput" placeholder="Type your answer..." autofocus />
+        <input type="text" id="typeInput" placeholder="Type your answer..." autocapitalize="off" autocorrect="off" spellcheck="false" autofocus />
         <button type="submit" class="submit-btn" id="submitBtn">Check</button>
       </form>
       <div class="feedback" id="feedback"></div>
@@ -102,17 +274,18 @@ function renderQuestion() {
     `;
   }
 
-  appEl.innerHTML = `
+  show(`
     ${renderHeader()}
+    ${renderNav()}
     ${renderStats()}
     <div class="card">
       <span class="category-tag">${escapeHtml(q.category)}</span>
       <p class="direction-hint">${hint}</p>
-      <p class="prompt">${escapeHtml(q.prompt)}</p>
+      <p class="prompt">${q.promptHtml || escapeHtml(q.prompt)}</p>
       ${bodyHtml}
     </div>
-    <footer>Made to help learn German, one word at a time.</footer>
-  `;
+    ${renderFooter()}
+  `);
 
   if (q.type === "mc") {
     document.querySelectorAll(".option").forEach((btn) => {
@@ -124,6 +297,7 @@ function renderQuestion() {
       e.preventDefault();
       handleTypeAnswer(q);
     });
+    document.getElementById("typeInput").focus();
   }
 
   document.getElementById("nextBtn").addEventListener("click", nextQuestion);
@@ -145,40 +319,57 @@ function handleMcAnswer(btn, q) {
     }
   });
 
-  showFeedback(correct, q);
+  showFeedback(correct, q, given);
 }
 
 function handleTypeAnswer(q) {
   if (answered) return;
-  answered = true;
 
   const input = document.getElementById("typeInput");
   const given = input.value;
+  if (!given.trim()) return;
+  answered = true;
+
   const correct = isCorrectAnswer(q, given);
 
   input.disabled = true;
   input.classList.add(correct ? "correct" : "wrong");
   document.getElementById("submitBtn").disabled = true;
 
-  showFeedback(correct, q);
+  showFeedback(correct, q, given);
 }
 
-function showFeedback(correct, q) {
+function showFeedback(correct, q, given) {
   const feedbackEl = document.getElementById("feedback");
   if (correct) {
     score++;
     streak++;
     testBestStreak = Math.max(testBestStreak, streak);
     bestStreak = Math.max(bestStreak, streak);
-    localStorage.setItem("de-quiz-best-streak", String(bestStreak));
+    storageSet("de-quiz-best-streak", String(bestStreak));
     feedbackEl.textContent = "✓ Correct!";
     feedbackEl.className = "feedback correct";
   } else {
     streak = 0;
+    mistakes.push({ q, given });
     feedbackEl.textContent = `✗ Correct answer: ${q.answer}`;
     feedbackEl.className = "feedback wrong";
   }
-  document.getElementById("nextBtn").classList.add("show");
+  if (q.sentence || q.why) {
+    feedbackEl.insertAdjacentHTML("afterend", renderExplanation(q));
+  }
+  const nextBtn = document.getElementById("nextBtn");
+  nextBtn.classList.add("show");
+  nextBtn.focus();
+}
+
+function renderExplanation(q) {
+  return `
+    <div class="explain">
+      ${q.sentence ? `<p class="model">${formatMarked(q.sentence, "mark")}</p>` : ""}
+      ${q.why ? `<p class="why">${escapeHtml(q.why)}</p>` : ""}
+    </div>
+  `;
 }
 
 function nextQuestion() {
@@ -188,18 +379,49 @@ function nextQuestion() {
 
 function renderSummary() {
   const pct = Math.round((score / quizQuestions.length) * 100);
-  appEl.innerHTML = `
+
+  let reviewHtml = "";
+  if (currentLesson) {
+    const best = getLessonBest();
+    best[currentLesson.id] = Math.max(best[currentLesson.id] || 0, score);
+    storageSet("de-quiz-lesson-best", JSON.stringify(best));
+
+    reviewHtml = mistakes.length
+      ? `
+        <div class="review">
+          <h3>Review your mistakes</h3>
+          ${mistakes
+            .map(
+              ({ q, given }) => `
+            <div class="review-item">
+              <p class="review-prompt">${q.promptHtml || escapeHtml(q.prompt)}</p>
+              <p class="review-given">Your answer: <span>${escapeHtml(given)}</span></p>
+              ${renderExplanation({ sentence: q.sentence || q.answer, why: q.why })}
+            </div>`
+            )
+            .join("")}
+        </div>`
+      : `<p class="perfect">No mistakes. Perfekt! 🎉</p>`;
+  }
+
+  show(`
     ${renderHeader()}
     <div class="card summary">
-      <p>Quiz complete!</p>
+      <p>${currentLesson ? escapeHtml(currentLesson.title) : "Quiz"} complete!</p>
       <div class="score">${score} / ${quizQuestions.length}</div>
       <p>${pct}% correct · Best streak this test: ${testBestStreak}</p>
       <p>All-time best streak: ${bestStreak}</p>
+      ${reviewHtml}
       <button class="restart-btn" id="restartBtn">Practice again</button>
+      <button class="secondary-btn" id="homeBtn">Back to menu</button>
     </div>
-    <footer>Made to help learn German, one word at a time.</footer>
-  `;
-  document.getElementById("restartBtn").addEventListener("click", startQuiz);
+    ${renderFooter()}
+  `);
+  document.getElementById("restartBtn").addEventListener("click", () => {
+    if (currentLesson) startLesson(currentLesson);
+    else startQuiz();
+  });
+  document.getElementById("homeBtn").addEventListener("click", renderHome);
 }
 
 function escapeHtml(str) {
@@ -210,4 +432,9 @@ function escapeHtml(str) {
     .replace(/"/g, "&quot;");
 }
 
-startQuiz();
+// Escapes text, then turns **word** into <tag>word</tag>.
+function formatMarked(str, tag) {
+  return escapeHtml(str).replace(/\*\*(.+?)\*\*/g, `<${tag}>$1</${tag}>`);
+}
+
+renderHome();

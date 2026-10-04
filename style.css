@@ -280,3 +280,225 @@ footer {
   color: var(--muted);
   font-size: 0.78rem;
 }
+
+/* --- Menu & lessons --- */
+
+.menu-card {
+  margin-bottom: 16px;
+}
+
+.menu-card h2,
+.lesson-heading {
+  margin: 0 0 6px;
+  font-size: 1.15rem;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin: 0 0 14px;
+}
+
+.group-title {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 20px 0 8px;
+}
+
+.lesson-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lesson-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.lesson-btn:hover {
+  border-color: var(--accent);
+}
+
+.lesson-meta {
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--accent);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.back-link {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-bottom: 12px;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.back-link:hover {
+  color: var(--accent);
+}
+
+.tip {
+  font-size: 0.93rem;
+  line-height: 1.5;
+  margin: 12px 0 20px;
+}
+
+.tip p,
+.tip ul,
+.tip ol {
+  margin: 0 0 10px;
+}
+
+.tip ul,
+.tip ol {
+  padding-left: 20px;
+}
+
+.tip h3 {
+  font-size: 0.95rem;
+  margin: 18px 0 8px;
+}
+
+table.ref {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 12px;
+  font-size: 0.88rem;
+}
+
+table.ref th,
+table.ref td {
+  text-align: left;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+table.ref th {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+/* --- Question extras --- */
+
+.prompt strong {
+  color: var(--accent);
+}
+
+.cue {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.explain {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+}
+
+.explain .model {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.explain .why {
+  margin: 6px 0 0;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+mark {
+  background: color-mix(in srgb, var(--accent) 24%, transparent);
+  color: inherit;
+  padding: 0 3px;
+  border-radius: 4px;
+}
+
+/* --- Summary extras --- */
+
+.secondary-btn {
+  display: block;
+  margin: 10px auto 0;
+  padding: 12px 24px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.review {
+  text-align: left;
+  margin: 20px 0 8px;
+}
+
+.review h3 {
+  font-size: 1rem;
+  margin: 0 0 4px;
+}
+
+.review-item {
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+}
+
+.summary .review-prompt {
+  margin: 0 0 4px;
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.summary .review-given {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.review-given span {
+  color: var(--wrong);
+  font-weight: 600;
+  text-decoration: line-through;
+}
+
+.summary .perfect {
+  color: var(--correct);
+  font-weight: 600;
+}
