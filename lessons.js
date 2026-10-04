@@ -41,6 +41,15 @@ const POSSESSIVE_TABLE = `
     <tr><td>plural</td><td>-e</td><td>meine Eltern</td></tr>
   </table>`;
 
+const POSSESSIVE_CASES = `
+  <table class="ref">
+    <tr><th></th><th>Nom.</th><th>Akk.</th><th>Dat.</th></tr>
+    <tr><td>der</td><td>mein</td><td>mein<strong>en</strong></td><td>mein<strong>em</strong></td></tr>
+    <tr><td>die</td><td>mein<strong>e</strong></td><td>mein<strong>e</strong></td><td>mein<strong>er</strong></td></tr>
+    <tr><td>das</td><td>mein</td><td>mein</td><td>mein<strong>em</strong></td></tr>
+    <tr><td>plural</td><td>mein<strong>e</strong></td><td>mein<strong>e</strong></td><td>mein<strong>en</strong></td></tr>
+  </table>`;
+
 const LESSONS = [
   // --- Personal pronouns --------------------------------------------------
   {
@@ -360,6 +369,63 @@ const LESSONS = [
       { q: "Frau Klein (talking to her)", a: "Ihr", options: ["sein", "ihr", "Ihr"], s: "Frau Klein → Sie → **Ihr**" },
     ],
   },
+  {
+    id: "p4",
+    group: "Possessive pronouns",
+    title: "Possessives · Accusative",
+    tip: `<p>In the accusative only the masculine changes. It gets <strong>-en</strong>, just like <em>den</em>, <em>ihn</em> and <em>einen</em>.</p>
+      <table class="ref">
+        <tr><th>Thing owned</th><th>Nominative</th><th>Accusative</th></tr>
+        <tr><td>der</td><td>mein Vater</td><td><strong>meinen</strong> Vater</td></tr>
+        <tr><td>die</td><td>meine Mutter</td><td>meine Mutter</td></tr>
+        <tr><td>das</td><td>mein Kind</td><td>mein Kind</td></tr>
+        <tr><td>plural</td><td>meine Eltern</td><td>meine Eltern</td></tr>
+      </table>
+      <ol>
+        <li>Who owns it? → mein / dein / sein / ihr / unser / Ihr...</li>
+        <li>What gender is the thing owned?</li>
+        <li>Is it a masculine accusative object? → add <strong>-en</strong></li>
+      </ol>
+      <p><em><strong>Mein</strong> Vater sieht mich.</em> (subject) · <em>Ich sehe <strong>meinen</strong> Vater.</em> (object)</p>`,
+    items: [
+      { q: "Ich sehe ___ Vater.", cue: "my · der Vater", a: "meinen", s: "Ich sehe **meinen** Vater.", why: "The father is the object → accusative. Masculine → -en, like der → den." },
+      { q: "Hast du ___ Schlüssel?", cue: "your, informal · der Schlüssel", a: "deinen", s: "Hast du **deinen** Schlüssel?", why: "Masculine object → -en." },
+      { q: "Er besucht ___ Mutter.", cue: "his · die Mutter", a: "seine", s: "Er besucht **seine** Mutter.", why: "Owner er → sein. Feminine → -e, the same as in the nominative." },
+      { q: "Sie liebt ___ Hund.", cue: "her · der Hund", a: "ihren", s: "Sie liebt **ihren** Hund.", why: "Owner sie → ihr. Masculine object → -en." },
+      { q: "Wir verkaufen ___ Auto.", cue: "our · das Auto", a: "unser", s: "Wir verkaufen **unser** Auto.", why: "Neuter doesn't change in the accusative → no ending." },
+      { q: "Ich kenne ___ Eltern.", cue: "their · die Eltern", a: "ihre", s: "Ich kenne **ihre** Eltern.", why: "their → ihr (sein is only for er/es). Plural → -e in the nominative and accusative." },
+      { q: "Herr Weber, ich habe ___ Koffer.", cue: "your, formal · der Koffer", a: "Ihren", s: "Herr Weber, ich habe **Ihren** Koffer.", why: "Talking to him → Ihr (capital). Masculine object → -en." },
+      { q: "Anna sucht ___ Bruder.", cue: "her · der Bruder", a: "ihren", s: "Anna sucht **ihren** Bruder.", why: "Anna = sie → ihr. Masculine object → -en." },
+    ],
+  },
+  {
+    id: "p5",
+    group: "Possessive pronouns",
+    title: "Possessives · Dative",
+    tip: `<p>In the dative every gender gets an ending, matching the dative article:</p>
+      <table class="ref">
+        <tr><th>Thing owned</th><th>Article</th><th>Possessive</th></tr>
+        <tr><td>der</td><td>de<strong>m</strong> Vater</td><td>meine<strong>m</strong> Vater</td></tr>
+        <tr><td>die</td><td>de<strong>r</strong> Mutter</td><td>meine<strong>r</strong> Mutter</td></tr>
+        <tr><td>das</td><td>de<strong>m</strong> Kind</td><td>meine<strong>m</strong> Kind</td></tr>
+        <tr><td>plural</td><td>de<strong>n</strong> Kinder<strong>n</strong></td><td>meine<strong>n</strong> Kinder<strong>n</strong></td></tr>
+      </table>
+      <ul>
+        <li>A possessive in the dative is never bare. Plain <em>ihr</em> or <em>sein</em> means an ending is missing.</li>
+        <li>Masculine or neuter → <strong>-em</strong>, feminine → <strong>-er</strong>, plural → <strong>-en</strong> (and the noun gets <strong>-n</strong>).</li>
+        <li>Dative triggers: dative verbs (<em>helfen, danken, gehören</em>...), the receiver (<em>geben, schenken</em>), and <em>mit, bei, von, zu</em>.</li>
+      </ul>`,
+    items: [
+      { q: "Ich helfe ___ Vater.", cue: "my · der Vater", a: "meinem", s: "Ich helfe **meinem** Vater.", why: "helfen + dative. Masculine: dem → meinem." },
+      { q: "Ich wohne bei ___ Mutter.", cue: "my · die Mutter", a: "meiner", s: "Ich wohne bei **meiner** Mutter.", why: "bei + dative. Feminine: der → meiner." },
+      { q: "Er spielt mit ___ Kind.", cue: "his · das Kind", a: "seinem", s: "Er spielt mit **seinem** Kind.", why: "Owner er → sein. mit + dative, neuter → -em. (mit ihr = with her, the personal pronoun.)" },
+      { q: "Sie schenkt ___ Bruder ein Buch.", cue: "her · der Bruder", a: "ihrem", s: "Sie schenkt **ihrem** Bruder ein Buch.", why: "He receives the book → dative. Masculine → -em." },
+      { q: "Wir danken ___ Eltern.", cue: "our · die Eltern", a: "unseren", alt: ["unsren", "unsern"], s: "Wir danken **unseren** Eltern.", why: "danken + dative. Plural → -en. Eltern already ends in n." },
+      { q: "Das Auto gehört ___ Schwester.", cue: "his · die Schwester", a: "seiner", s: "Das Auto gehört **seiner** Schwester.", why: "Owner er → sein. gehören + dative, feminine → -er." },
+      { q: "Herr Weber, ich spreche mit ___ Frau.", cue: "your, formal · die Frau", a: "Ihrer", s: "Herr Weber, ich spreche mit **Ihrer** Frau.", why: "Talking to him → Ihr (capital). mit + dative, feminine → -er." },
+      { q: "Anna fährt mit ___ Kindern.", cue: "her · die Kinder", a: "ihren", s: "Anna fährt mit **ihren** Kindern.", why: "Anna = sie → ihr. Dative plural → -en, and the noun gets -n: Kindern." },
+    ],
+  },
 
   // --- Review -------------------------------------------------------------
   {
@@ -401,4 +467,6 @@ const CHEAT_SHEET = `
   </ol>
   <h3>Dative verbs</h3>${DATIVE_VERBS}
   <h3>Possessive pronouns</h3>${POSSESSIVE_TABLE}
-  <p>er / es → <strong>sein</strong> · sie, sie (plural), Sie → <strong>ihr / Ihr</strong></p>`;
+  <p>er / es → <strong>sein</strong> · sie, sie (plural), Sie → <strong>ihr / Ihr</strong></p>
+  <h3>Possessive endings by case</h3>${POSSESSIVE_CASES}
+  <p>Masculine accusative → <strong>-en</strong>. Dative: masculine/neuter → <strong>-em</strong>, feminine → <strong>-er</strong>, plural → <strong>-en</strong>. A dative possessive is never bare.</p>`;
