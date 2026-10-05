@@ -50,6 +50,17 @@ const POSSESSIVE_CASES = `
     <tr><td>plural</td><td>mein<strong>e</strong></td><td>mein<strong>e</strong></td><td>mein<strong>en</strong></td></tr>
   </table>`;
 
+const REFLEXIVE_TABLE = `
+  <table class="ref">
+    <tr><th></th><th>Akk.</th><th>Dat.</th></tr>
+    <tr><td>ich</td><td>mich</td><td>mir</td></tr>
+    <tr><td>du</td><td>dich</td><td>dir</td></tr>
+    <tr><td>er / sie / es</td><td><strong>sich</strong></td><td><strong>sich</strong></td></tr>
+    <tr><td>wir</td><td>uns</td><td>uns</td></tr>
+    <tr><td>ihr</td><td>euch</td><td>euch</td></tr>
+    <tr><td>sie / Sie</td><td><strong>sich</strong></td><td><strong>sich</strong></td></tr>
+  </table>`;
+
 const LESSONS = [
   // --- Personal pronouns --------------------------------------------------
   {
@@ -427,6 +438,53 @@ const LESSONS = [
     ],
   },
 
+  // --- Reflexive pronouns -------------------------------------------------
+  {
+    id: "f1",
+    group: "Reflexive pronouns",
+    title: "Reflexive · Round 1",
+    tip: `<p>Use a reflexive pronoun when the subject and the object are the same person:<br>
+      <em>Er wäscht <strong>ihn</strong>.</em> (someone else) · <em>Er wäscht <strong>sich</strong>.</em> (himself)</p>${REFLEXIVE_TABLE}
+      <ul>
+        <li><strong>sich</strong> is the only new word: er, sie, es, sie (plural) and formal Sie.</li>
+        <li><strong>sich</strong> is never capitalized, even when formal: <em>Setzen Sie sich.</em></li>
+        <li>The accusative is the default here too.</li>
+        <li>Reflexive in German but not in English: <em>sich freuen, sich beeilen, sich erinnern, sich interessieren, sich setzen</em>.</li>
+      </ul>`,
+    items: [
+      { q: "Ich freue ___ auf das Wochenende.", a: "mich", s: "Ich freue **mich** auf das Wochenende.", why: "sich freuen is reflexive. ich → mich." },
+      { q: "Du musst ___ beeilen.", a: "dich", s: "Du musst **dich** beeilen.", why: "No other object → accusative: dich. (dir only when there's another accusative object.)" },
+      { q: "Er wäscht ___.", cue: "himself", a: "sich", s: "Er wäscht **sich**.", why: "Subject and object are the same person → reflexive. er → sich." },
+      { q: "Wir treffen ___ um acht.", cue: "each other", a: "uns", s: "Wir treffen **uns** um acht.", why: "wir → uns. In the plural, the reflexive can mean 'each other'." },
+      { q: "Setzt ___!", cue: "you all, sit down", a: "euch", s: "Setzt **euch**!", why: "Command form for ihr. ihr → euch." },
+      { q: "Sie interessiert ___ für Musik.", cue: "she", a: "sich", s: "Sie interessiert **sich** für Musik.", why: "sich interessieren für = to be interested in. sie → sich." },
+      { q: "Herr Weber, setzen Sie ___ bitte.", cue: "you, formal", a: "sich", s: "Herr Weber, setzen Sie **sich** bitte.", why: "sich is never capitalized, even for formal Sie." },
+      { q: "Erinnerst du ___ an mich?", a: "dich", s: "Erinnerst du **dich** an mich?", why: "sich erinnern an = to remember. No other object → dich." },
+    ],
+  },
+  {
+    id: "f2",
+    group: "Reflexive pronouns",
+    title: "Reflexive · Accusative or dative?",
+    tip: `<p>Ask: <strong>is there already another object</strong> (a thing, body part or piece of clothing)?</p>
+      <ul>
+        <li><strong>No</strong> → accusative: <em>Ich wasche <strong>mich</strong>.</em></li>
+        <li><strong>Yes</strong> → dative: <em>Ich wasche <strong>mir</strong> die Hände.</em></li>
+      </ul>
+      <p>Only <strong>ich</strong> (mich/mir) and <strong>du</strong> (dich/dir) look different. All other forms are the same in both cases.</p>
+      <p>For body parts and clothes, German uses the dative reflexive instead of a possessive: "I wash <em>my</em> hands" = <em>Ich wasche <strong>mir</strong> die Hände.</em></p>`,
+    items: [
+      { q: "Ich wasche ___.", cue: "myself", a: "mich", s: "Ich wasche **mich**.", why: "No other object → accusative." },
+      { q: "Ich wasche ___ die Hände.", a: "mir", s: "Ich wasche **mir** die Hände.", why: "die Hände is the accusative object → the reflexive is dative." },
+      { q: "Du putzt ___ die Zähne.", a: "dir", s: "Du putzt **dir** die Zähne.", why: "die Zähne is the object → dative: dir." },
+      { q: "Ich ziehe ___ an.", cue: "I get dressed", a: "mich", s: "Ich ziehe **mich** an.", why: "No other object → accusative." },
+      { q: "Ich ziehe ___ eine Jacke an.", a: "mir", s: "Ich ziehe **mir** eine Jacke an.", why: "eine Jacke is the object → dative: mir." },
+      { q: "Wünschst du ___ ein Fahrrad?", cue: "do you wish for a bike?", a: "dir", s: "Wünschst du **dir** ein Fahrrad?", why: "ein Fahrrad is the object → dative: dir." },
+      { q: "Er kämmt ___ die Haare.", a: "sich", s: "Er kämmt **sich** die Haare.", why: "Dative (die Haare is the object), but er → sich in both cases." },
+      { q: "Ich stelle ___ vor.", cue: "I introduce myself", a: "mich", s: "Ich stelle **mich** vor.", why: "No other object → accusative. (Ich stelle mir das vor = I imagine that.)" },
+    ],
+  },
+
   // --- Review -------------------------------------------------------------
   {
     id: "m1",
@@ -469,4 +527,6 @@ const CHEAT_SHEET = `
   <h3>Possessive pronouns</h3>${POSSESSIVE_TABLE}
   <p>er / es → <strong>sein</strong> · sie, sie (plural), Sie → <strong>ihr / Ihr</strong></p>
   <h3>Possessive endings by case</h3>${POSSESSIVE_CASES}
-  <p>Masculine accusative → <strong>-en</strong>. Dative: masculine/neuter → <strong>-em</strong>, feminine → <strong>-er</strong>, plural → <strong>-en</strong>. A dative possessive is never bare.</p>`;
+  <p>Masculine accusative → <strong>-en</strong>. Dative: masculine/neuter → <strong>-em</strong>, feminine → <strong>-er</strong>, plural → <strong>-en</strong>. A dative possessive is never bare.</p>
+  <h3>Reflexive pronouns</h3>${REFLEXIVE_TABLE}
+  <p><strong>sich</strong> is never capitalized. Another object in the sentence (a thing, body part or clothing) → dative: <em>Ich wasche <strong>mir</strong> die Hände.</em> Otherwise → accusative: <em>Ich wasche <strong>mich</strong>.</em></p>`;

@@ -133,7 +133,7 @@ function renderHeader() {
   return `
     <header>
       <h1>Personalpronomen 🇩🇪</h1>
-      <p>Nominativ · Akkusativ · Dativ · Genitiv · Possessiv · Futur I</p>
+      <p>Nominativ · Akkusativ · Dativ · Genitiv · Possessiv · Reflexiv · Futur I</p>
     </header>
   `;
 }
