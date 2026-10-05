@@ -355,12 +355,22 @@ function showFeedback(correct, q, given) {
     feedbackEl.textContent = `✗ Correct answer: ${q.answer}`;
     feedbackEl.className = "feedback wrong";
   }
-  if (q.sentence || q.why) {
-    feedbackEl.insertAdjacentHTML("afterend", renderExplanation(q));
+  const sentence = modelSentence(q);
+  if (sentence || q.why) {
+    feedbackEl.insertAdjacentHTML("afterend", renderExplanation({ sentence, why: q.why }));
   }
   const nextBtn = document.getElementById("nextBtn");
   nextBtn.classList.add("show");
   nextBtn.focus();
+}
+
+// The correct sentence with the answer marked. Lessons provide one; for generated
+// fill-in-the-blank questions ("Ich liebe ___. (I love you.)") it's built by filling the blank.
+function modelSentence(q) {
+  if (q.sentence) return q.sentence;
+  if (!q.prompt.includes("___")) return null;
+  const german = q.prompt.split(" (")[0];
+  return german.replace("___", `**${q.answer}**`);
 }
 
 function renderExplanation(q) {
@@ -380,29 +390,30 @@ function nextQuestion() {
 function renderSummary() {
   const pct = Math.round((score / quizQuestions.length) * 100);
 
-  let reviewHtml = "";
   if (currentLesson) {
     const best = getLessonBest();
     best[currentLesson.id] = Math.max(best[currentLesson.id] || 0, score);
     storageSet("de-quiz-lesson-best", JSON.stringify(best));
-
-    reviewHtml = mistakes.length
-      ? `
-        <div class="review">
-          <h3>Review your mistakes</h3>
-          ${mistakes
-            .map(
-              ({ q, given }) => `
-            <div class="review-item">
-              <p class="review-prompt">${q.promptHtml || escapeHtml(q.prompt)}</p>
-              <p class="review-given">Your answer: <span>${escapeHtml(given)}</span></p>
-              ${renderExplanation({ sentence: q.sentence || q.answer, why: q.why })}
-            </div>`
-            )
-            .join("")}
-        </div>`
-      : `<p class="perfect">No mistakes. Perfekt! 🎉</p>`;
   }
+
+  const reviewHtml = mistakes.length
+    ? `
+      <div class="review">
+        <h3>Review your mistakes (${mistakes.length})</h3>
+        ${mistakes
+          .map(({ q, given }) => {
+            const sentence = modelSentence(q);
+            return `
+          <div class="review-item">
+            <p class="review-prompt">${q.promptHtml || escapeHtml(q.prompt)}</p>
+            <p class="review-given">✗ Your answer: <span>${escapeHtml(given)}</span></p>
+            <p class="review-correct">✓ Correct: <strong>${escapeHtml(q.answer)}</strong></p>
+            ${sentence || q.why ? renderExplanation({ sentence, why: q.why }) : ""}
+          </div>`;
+          })
+          .join("")}
+      </div>`
+    : `<p class="perfect">No mistakes. Perfekt! 🎉</p>`;
 
   show(`
     ${renderHeader()}

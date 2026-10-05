@@ -498,6 +498,12 @@ mark {
   text-decoration: line-through;
 }
 
+.summary .review-correct {
+  margin: 2px 0 0;
+  font-size: 0.85rem;
+  color: var(--correct);
+}
+
 .summary .perfect {
   color: var(--correct);
   font-weight: 600;
