@@ -9,6 +9,7 @@ let testBestStreak = 0;
 let bestStreak = Number(storageGet("de-quiz-best-streak") || 0);
 let answered = false;
 let currentLesson = null; // null = random quiz
+let currentPool = null; // question pool of the running random quiz
 let mistakes = [];
 
 function storageGet(key) {
@@ -116,9 +117,10 @@ function show(html) {
   });
 }
 
-function startQuiz() {
+function startQuiz(pool = QUESTIONS) {
   currentLesson = null;
-  quizQuestions = shuffle(QUESTIONS).slice(0, QUESTIONS_PER_TEST);
+  currentPool = pool;
+  quizQuestions = shuffle(pool).slice(0, QUESTIONS_PER_TEST);
   resetProgress();
   renderQuestion();
 }
@@ -143,8 +145,8 @@ function renderHeader(topic = "all") {
   return `
     <header>
       <h1>Personalpronomen 🇩🇪</h1>
-      <p>Nominativ · Akkusativ · Dativ · Genitiv · Possessiv · Reflexiv · Futur I</p>
-      <a class="cheat-link" id="cheatLink" href="cheatsheet.html?v=7#${topic}" target="cheatsheet">📋 Cheat sheet</a>
+      <p>Nominativ · Akkusativ · Dativ · Genitiv · Possessiv · Reflexiv · Futur I · Passiv</p>
+      <a class="cheat-link" id="cheatLink" href="cheatsheet.html?v=8#${topic}" target="cheatsheet">📋 Cheat sheet</a>
     </header>
   `;
 }
@@ -156,7 +158,15 @@ function lessonTopic(lesson) {
 // Random quiz questions only reveal the topic, never the case.
 function questionTopic(q) {
   if (currentLesson) return lessonTopic(currentLesson);
+  if (q.category === "Passive") return "passive";
   return q.category === "Future (Futur I)" ? "futur" : "pronouns";
+}
+
+// The cheat sheet section for a whole test: its single topic, or "all" when mixed.
+function quizTopic() {
+  if (currentLesson) return lessonTopic(currentLesson);
+  const topics = new Set(quizQuestions.map(questionTopic));
+  return topics.size === 1 ? [...topics][0] : "all";
 }
 
 function renderFooter() {
@@ -203,6 +213,23 @@ function renderHome() {
         .join("")}
     </div>
     <div class="card menu-card">
+      <h2>Passive voice (Passiv)</h2>
+      <p class="muted">Turn active sentences with <em>man</em> into the passive. The active sentence's tense tells you which passive tense to use. ${QUESTIONS_PER_TEST} random questions per test.</p>
+      <div class="lesson-list">
+        ${PASSIVE_TENSES.map(
+          (t) => `
+          <button class="lesson-btn passive-btn" data-tense="${t.id}">
+            <span>${escapeHtml(t.name)}</span>
+            <span class="lesson-meta">${PASSIVE_QUESTIONS[t.id].length.toLocaleString()} questions</span>
+          </button>`
+        ).join("")}
+        <button class="lesson-btn passive-btn" data-tense="all">
+          <span>All tenses mixed</span>
+          <span class="lesson-meta">${PASSIVE_ALL.length.toLocaleString()} questions</span>
+        </button>
+      </div>
+    </div>
+    <div class="card menu-card">
       <h2>Random quiz</h2>
       <p class="muted">${QUESTIONS_PER_TEST} random questions from ${QUESTIONS.length.toLocaleString()} generated sentences, covering every case plus Futur I.</p>
       <button class="restart-btn" id="randomBtn">Start random quiz</button>
@@ -210,8 +237,14 @@ function renderHome() {
     ${renderFooter()}
   `);
 
-  document.getElementById("randomBtn").addEventListener("click", startQuiz);
-  document.querySelectorAll(".lesson-btn").forEach((btn) => {
+  document.getElementById("randomBtn").addEventListener("click", () => startQuiz());
+  document.querySelectorAll(".passive-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const tense = btn.dataset.tense;
+      startQuiz(tense === "all" ? PASSIVE_ALL : PASSIVE_QUESTIONS[tense]);
+    });
+  });
+  document.querySelectorAll(".lesson-btn[data-id]").forEach((btn) => {
     btn.addEventListener("click", () => {
       renderLessonIntro(LESSONS.find((l) => l.id === btn.dataset.id));
     });
@@ -423,7 +456,7 @@ function renderSummary() {
     : `<p class="perfect">No mistakes. Perfekt! 🎉</p>`;
 
   show(`
-    ${renderHeader(currentLesson ? lessonTopic(currentLesson) : "all")}
+    ${renderHeader(quizTopic())}
     <div class="card summary">
       <p>${currentLesson ? escapeHtml(currentLesson.title) : "Quiz"} complete!</p>
       <div class="score">${score} / ${quizQuestions.length}</div>
@@ -437,7 +470,7 @@ function renderSummary() {
   `);
   document.getElementById("restartBtn").addEventListener("click", () => {
     if (currentLesson) startLesson(currentLesson);
-    else startQuiz();
+    else startQuiz(currentPool);
   });
   document.getElementById("homeBtn").addEventListener("click", renderHome);
 }

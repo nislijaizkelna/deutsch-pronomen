@@ -595,6 +595,48 @@ const CHEAT_SECTIONS = [
       </ul>`,
   },
   {
+    id: "passive",
+    title: "Passive voice",
+    html: `
+      <p>The passive is about what happens, not who does it. The active object becomes the subject:<br>
+      <em>Man repariert <strong>den</strong> Computer.</em> → <em><strong>Der</strong> Computer wird repariert.</em></p>
+      <table class="ref">
+        <tr><th>Tense</th><th>Formula</th><th>Example</th></tr>
+        <tr><td>Präsens</td><td>werden + PII</td><td>Das Auto <strong>wird</strong> repariert.</td></tr>
+        <tr><td>Präteritum</td><td>wurde + PII</td><td>Das Auto <strong>wurde</strong> repariert.</td></tr>
+        <tr><td>Perfekt</td><td>sein + PII + worden</td><td>Das Auto <strong>ist</strong> repariert <strong>worden</strong>.</td></tr>
+        <tr><td>Plusquamperfekt</td><td>war + PII + worden</td><td>Das Auto <strong>war</strong> repariert <strong>worden</strong>.</td></tr>
+        <tr><td>Futur I</td><td>werden + PII + werden</td><td>Das Auto <strong>wird</strong> repariert <strong>werden</strong>.</td></tr>
+        <tr><td>Futur II</td><td>werden + PII + worden sein</td><td>Das Auto <strong>wird</strong> repariert <strong>worden sein</strong>.</td></tr>
+      </table>
+      <h3>Which tense? Match the active sentence</h3>
+      <table class="ref">
+        <tr><th>Active</th><th>Passive</th></tr>
+        <tr><td>Man repariert …</td><td>… wird repariert.</td></tr>
+        <tr><td>Man reparierte …</td><td>… wurde repariert.</td></tr>
+        <tr><td>Man hat … repariert.</td><td>… ist repariert worden.</td></tr>
+        <tr><td>Man hatte … repariert.</td><td>… war repariert worden.</td></tr>
+        <tr><td>Man wird … reparieren.</td><td>… wird repariert werden.</td></tr>
+        <tr><td>Man wird … repariert haben.</td><td>… wird repariert worden sein.</td></tr>
+      </table>
+      <h3>Auxiliaries</h3>
+      <table class="ref">
+        <tr><th></th><th>werden</th><th>wurde</th><th>sein</th><th>war</th></tr>
+        <tr><td>ich</td><td>werde</td><td>wurde</td><td>bin</td><td>war</td></tr>
+        <tr><td>du</td><td>wirst</td><td>wurdest</td><td>bist</td><td>warst</td></tr>
+        <tr><td>er / sie / es</td><td>wird</td><td>wurde</td><td>ist</td><td>war</td></tr>
+        <tr><td>wir</td><td>werden</td><td>wurden</td><td>sind</td><td>waren</td></tr>
+        <tr><td>ihr</td><td>werdet</td><td>wurdet</td><td>seid</td><td>wart</td></tr>
+        <tr><td>sie / Sie</td><td>werden</td><td>wurden</td><td>sind</td><td>waren</td></tr>
+      </table>
+      <ul>
+        <li>The verb agrees with the new subject: <em>Die Häuser <strong>werden</strong> gebaut.</em> · <em>Ich <strong>werde</strong> gefragt.</em></li>
+        <li>Pronoun objects switch to the nominative: mich → ich, dich → du, uns → wir, euch → ihr.</li>
+        <li>Perfekt and Plusquamperfekt use <strong>worden</strong>, never <em>geworden</em>.</li>
+        <li><em>man</em> disappears. A named doer uses <strong>von + dative</strong>: <em>Das Auto wird <strong>vom</strong> Mechaniker repariert.</em></li>
+      </ul>`,
+  },
+  {
     id: "futur",
     title: "Futur I",
     html: `
