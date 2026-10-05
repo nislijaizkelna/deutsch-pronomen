@@ -513,20 +513,113 @@ const LESSONS = [
   },
 ];
 
-const CHEAT_SHEET = `
-  <h3>Personal pronouns</h3>${PRONOUN_TABLE}
-  <h3>Rules</h3>
-  <ol>
-    <li><strong>The accusative is the default.</strong> Use the dative only for dative verbs, for the receiver of something, and after dative prepositions like <em>mit</em>.</li>
-    <li><strong>The pronoun matches the article:</strong> den → ihn, dem → ihm, dative der → ihr.</li>
-    <li><strong>"Him" is never ihr.</strong></li>
-    <li><strong>Formal "you"</strong> = the "they" forms, capitalized: Sie / Sie / Ihnen.</li>
-    <li><strong>Two pronouns:</strong> the thing before the person: <em>Ich gebe es dir.</em></li>
-  </ol>
-  <h3>Dative verbs</h3>${DATIVE_VERBS}
-  <h3>Possessive pronouns</h3>${POSSESSIVE_TABLE}
-  <p>er / es → <strong>sein</strong> · sie, sie (plural), Sie → <strong>ihr / Ihr</strong></p>
-  <h3>Possessive endings by case</h3>${POSSESSIVE_CASES}
-  <p>Masculine accusative → <strong>-en</strong>. Dative: masculine/neuter → <strong>-em</strong>, feminine → <strong>-er</strong>, plural → <strong>-en</strong>. A dative possessive is never bare.</p>
-  <h3>Reflexive pronouns</h3>${REFLEXIVE_TABLE}
-  <p><strong>sich</strong> is never capitalized. Another object in the sentence (a thing, body part or clothing) → dative: <em>Ich wasche <strong>mir</strong> die Hände.</em> Otherwise → accusative: <em>Ich wasche <strong>mich</strong>.</em></p>`;
+// Cheat sheet sections, shown in their own window (cheatsheet.html#<id>).
+const CHEAT_SECTIONS = [
+  {
+    id: "pronouns",
+    title: "Personal pronouns",
+    html: `
+      <table class="ref">
+        <tr><th></th><th>Nom.</th><th>Akk.</th><th>Dat.</th><th>Gen.</th></tr>
+        <tr><td>I</td><td>ich</td><td>mich</td><td>mir</td><td>meiner</td></tr>
+        <tr><td>you (informal)</td><td>du</td><td>dich</td><td>dir</td><td>deiner</td></tr>
+        <tr><td>he</td><td>er</td><td>ihn</td><td>ihm</td><td>seiner</td></tr>
+        <tr><td>she</td><td>sie</td><td>sie</td><td>ihr</td><td>ihrer</td></tr>
+        <tr><td>it</td><td>es</td><td>es</td><td>ihm</td><td>seiner</td></tr>
+        <tr><td>we</td><td>wir</td><td>uns</td><td>uns</td><td>unser</td></tr>
+        <tr><td>you all</td><td>ihr</td><td>euch</td><td>euch</td><td>euer</td></tr>
+        <tr><td>they</td><td>sie</td><td>sie</td><td>ihnen</td><td>ihrer</td></tr>
+        <tr><td>you (formal)</td><td>Sie</td><td>Sie</td><td>Ihnen</td><td>Ihrer</td></tr>
+      </table>
+      <h3>Which case?</h3>
+      <ol>
+        <li><strong>The accusative is the default.</strong> Most verbs take it.</li>
+        <li><strong>Dative:</strong> dative verbs, the receiver of something (<em>geben, schenken, zeigen</em>), and after <em>mit, bei, von, zu, aus, nach, seit</em>.</li>
+        <li><strong>Accusative prepositions:</strong> <em>für, durch, gegen, ohne, um</em>.</li>
+        <li><strong>Genitive prepositions:</strong> <em>wegen, trotz, während, statt, innerhalb, außerhalb, aufgrund, angesichts</em>.</li>
+        <li><strong>The pronoun matches the article:</strong> den → ihn, dem → ihm, dative der → ihr. "Him" is never <em>ihr</em>.</li>
+        <li><strong>Objects follow the noun's gender:</strong> der Tisch → ihn, die Lampe → sie, das Buch → es.</li>
+      </ol>
+      <h3>Dative verbs</h3>${DATIVE_VERBS}
+      <h3>Two pronouns</h3>
+      <table class="ref">
+        <tr><th>Objects</th><th>Order</th></tr>
+        <tr><td>two nouns</td><td>person (Dat.) → thing (Akk.)<br><em>Ich gebe dem Mann den Schlüssel.</em></td></tr>
+        <tr><td>noun + pronoun</td><td>pronoun first<br><em>Ich gebe ihm den Schlüssel.</em></td></tr>
+        <tr><td>two pronouns</td><td>thing (Akk.) → person (Dat.)<br><em>Ich gebe ihn ihm.</em></td></tr>
+      </table>`,
+  },
+  {
+    id: "sie",
+    title: "Formal Sie",
+    html: `
+      <p>Formal "you" uses the "they" forms, always with a capital letter:</p>
+      <table class="ref">
+        <tr><th></th><th>Nom.</th><th>Akk.</th><th>Dat.</th><th>Possessive</th></tr>
+        <tr><td>they</td><td>sie</td><td>sie</td><td>ihnen</td><td>ihr</td></tr>
+        <tr><td>you (formal)</td><td>Sie</td><td>Sie</td><td>Ihnen</td><td>Ihr</td></tr>
+      </table>
+      <h3>The trick: what would you say about a man?</h3>
+      <table class="ref">
+        <tr><th>About a man</th><th>Formal "you"</th></tr>
+        <tr><td>er (subject)</td><td>Sie</td></tr>
+        <tr><td>ihn (accusative)</td><td>Sie</td></tr>
+        <tr><td>ihm (dative)</td><td>Ihnen</td></tr>
+      </table>
+      <ul>
+        <li>Talking <em>to</em> Herr Weber → <strong>Ihr</strong> Koffer. Talking <em>about</em> him → <strong>sein</strong> Koffer.</li>
+        <li><strong>sich</strong> is never capitalized: <em>Setzen Sie sich.</em></li>
+      </ul>`,
+  },
+  {
+    id: "possessive",
+    title: "Possessive pronouns",
+    html: `${POSSESSIVE_TABLE}
+      <p>er / es → <strong>sein</strong> · sie, sie (plural), Sie → <strong>ihr / Ihr</strong>. The ending follows the thing owned, not the owner: <em>seine Mutter</em>.</p>
+      <h3>Endings by case</h3>${POSSESSIVE_CASES}
+      <ul>
+        <li>Masculine accusative → <strong>-en</strong>: <em>Ich sehe meinen Vater.</em></li>
+        <li>Dative: masculine/neuter → <strong>-em</strong>, feminine → <strong>-er</strong>, plural → <strong>-en</strong> (and the noun gets <strong>-n</strong>: <em>mit meinen Kindern</em>).</li>
+        <li>A dative possessive is never bare.</li>
+      </ul>`,
+  },
+  {
+    id: "reflexive",
+    title: "Reflexive pronouns",
+    html: `${REFLEXIVE_TABLE}
+      <ul>
+        <li><strong>sich</strong> covers er, sie, es, sie (plural) and Sie, and is never capitalized.</li>
+        <li>Another object in the sentence (a thing, body part or clothing) → dative: <em>Ich wasche <strong>mir</strong> die Hände.</em></li>
+        <li>Otherwise → accusative: <em>Ich wasche <strong>mich</strong>.</em></li>
+        <li>Reflexive in German but not in English: <em>sich freuen, sich beeilen, sich erinnern, sich interessieren, sich setzen</em>.</li>
+      </ul>`,
+  },
+  {
+    id: "futur",
+    title: "Futur I",
+    html: `
+      <p><strong>werden</strong> + infinitive at the end: <em>Ich <strong>werde</strong> morgen <strong>gehen</strong>.</em></p>
+      <table class="ref">
+        <tr><th></th><th>werden</th></tr>
+        <tr><td>ich</td><td>werde</td></tr>
+        <tr><td>du</td><td>wirst</td></tr>
+        <tr><td>er / sie / es</td><td>wird</td></tr>
+        <tr><td>wir</td><td>werden</td></tr>
+        <tr><td>ihr</td><td>werdet</td></tr>
+        <tr><td>sie / Sie</td><td>werden</td></tr>
+      </table>
+      <ul>
+        <li>Starting with a time word, the verb stays second: <em>Morgen <strong>werde</strong> ich gehen.</em></li>
+        <li>With a time word, everyday German often uses the present tense: <em>Ich gehe morgen.</em></li>
+      </ul>`,
+  },
+];
+
+// Which cheat sheet section fits each lesson group.
+const CHEAT_TOPIC_BY_GROUP = {
+  "Personal pronouns": "pronouns",
+  "Formal Sie": "sie",
+  "Possessive pronouns": "possessive",
+  "Reflexive pronouns": "reflexive",
+  Review: "all",
+};

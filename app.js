@@ -82,7 +82,7 @@ function lessonQuestions(lesson) {
     if (lesson.translate) caseMode = "sentence";
     else if (item.options || !/(^|[.!?]\s+)___/.test(item.q)) caseMode = "exact";
     return {
-      category: lesson.title,
+      category: lesson.group,
       type: item.options ? "mc" : "type",
       hint: lesson.hint || (item.options ? "Choose the correct answer" : "Fill in the missing word"),
       prompt: item.q,
@@ -105,6 +105,15 @@ function show(html) {
   window.scrollTo(0, 0);
   const menuBtn = document.getElementById("menuBtn");
   if (menuBtn) menuBtn.addEventListener("click", renderHome);
+  const cheatLink = document.getElementById("cheatLink");
+  cheatLink.addEventListener("click", (e) => {
+    // Reuses one named window; if popups are blocked the link opens a tab instead.
+    const win = window.open(cheatLink.href, "cheatsheet", "popup,width=560,height=820");
+    if (win) {
+      e.preventDefault();
+      win.focus();
+    }
+  });
 }
 
 function startQuiz() {
@@ -129,13 +138,25 @@ function resetProgress() {
   mistakes = [];
 }
 
-function renderHeader() {
+// topic: which cheat sheet section fits the current screen (an id from CHEAT_SECTIONS, or "all").
+function renderHeader(topic = "all") {
   return `
     <header>
       <h1>Personalpronomen 🇩🇪</h1>
       <p>Nominativ · Akkusativ · Dativ · Genitiv · Possessiv · Reflexiv · Futur I</p>
+      <a class="cheat-link" id="cheatLink" href="cheatsheet.html?v=7#${topic}" target="cheatsheet">📋 Cheat sheet</a>
     </header>
   `;
+}
+
+function lessonTopic(lesson) {
+  return CHEAT_TOPIC_BY_GROUP[lesson.group] || "all";
+}
+
+// Random quiz questions only reveal the topic, never the case.
+function questionTopic(q) {
+  if (currentLesson) return lessonTopic(currentLesson);
+  return q.category === "Future (Futur I)" ? "futur" : "pronouns";
 }
 
 function renderFooter() {
@@ -161,7 +182,6 @@ function renderHome() {
     <div class="card menu-card">
       <h2>Lessons</h2>
       <p class="muted">The practice rounds from our sessions, with the correct sentence and an explanation after every answer.</p>
-      <button class="link-btn" id="cheatBtn">📋 Cheat sheet</button>
       ${groups
         .map(
           (g) => `
@@ -191,7 +211,6 @@ function renderHome() {
   `);
 
   document.getElementById("randomBtn").addEventListener("click", startQuiz);
-  document.getElementById("cheatBtn").addEventListener("click", renderCheatSheet);
   document.querySelectorAll(".lesson-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
       renderLessonIntro(LESSONS.find((l) => l.id === btn.dataset.id));
@@ -201,7 +220,7 @@ function renderHome() {
 
 function renderLessonIntro(lesson) {
   show(`
-    ${renderHeader()}
+    ${renderHeader(lessonTopic(lesson))}
     ${renderNav()}
     <div class="card">
       <span class="category-tag">${escapeHtml(lesson.group)}</span>
@@ -212,18 +231,6 @@ function renderLessonIntro(lesson) {
     ${renderFooter()}
   `);
   document.getElementById("startBtn").addEventListener("click", () => startLesson(lesson));
-}
-
-function renderCheatSheet() {
-  show(`
-    ${renderHeader()}
-    ${renderNav()}
-    <div class="card">
-      <h2 class="lesson-heading">Cheat sheet</h2>
-      <div class="tip">${CHEAT_SHEET}</div>
-    </div>
-    ${renderFooter()}
-  `);
 }
 
 function renderStats() {
@@ -275,11 +282,11 @@ function renderQuestion() {
   }
 
   show(`
-    ${renderHeader()}
+    ${renderHeader(questionTopic(q))}
     ${renderNav()}
     ${renderStats()}
     <div class="card">
-      <span class="category-tag">${escapeHtml(q.category)}</span>
+      <span class="category-tag">${escapeHtml(topicLabel(questionTopic(q), q))}</span>
       <p class="direction-hint">${hint}</p>
       <p class="prompt">${q.promptHtml || escapeHtml(q.prompt)}</p>
       ${bodyHtml}
@@ -416,7 +423,7 @@ function renderSummary() {
     : `<p class="perfect">No mistakes. Perfekt! 🎉</p>`;
 
   show(`
-    ${renderHeader()}
+    ${renderHeader(currentLesson ? lessonTopic(currentLesson) : "all")}
     <div class="card summary">
       <p>${currentLesson ? escapeHtml(currentLesson.title) : "Quiz"} complete!</p>
       <div class="score">${score} / ${quizQuestions.length}</div>
@@ -433,6 +440,12 @@ function renderSummary() {
     else startQuiz();
   });
   document.getElementById("homeBtn").addEventListener("click", renderHome);
+}
+
+function topicLabel(topic, q) {
+  if (currentLesson) return q.category;
+  const section = CHEAT_SECTIONS.find((sec) => sec.id === topic);
+  return section ? section.title : "Random quiz";
 }
 
 function escapeHtml(str) {

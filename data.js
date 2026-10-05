@@ -69,6 +69,14 @@ function pickDistractors(forms, targetIdx, excludeIdxs, count) {
   return result;
 }
 
+// Distractors for a missing pronoun: the same person's form in another case first
+// (dich ↔ dir, ihn ↔ ihm), so the options don't give away which case is needed.
+function caseDistractors(forms, targetIdx, excludeIdxs, otherCaseForm) {
+  const first = otherCaseForm !== forms[targetIdx] ? [otherCaseForm] : [];
+  const rest = pickDistractors(forms, targetIdx, excludeIdxs, 3).filter((f) => !first.includes(f));
+  return [...first, ...rest].slice(0, 3);
+}
+
 // --- Verb banks -----------------------------------------------------------
 // Regular (weak, no vowel-change) verbs only, so `conjugate()` stays correct.
 
@@ -205,17 +213,17 @@ function buildAccQuestions() {
           category: "Akkusativ",
           type: "type",
           direction: "en-de",
-          hint: "Fill in the missing pronoun (Akkusativ)",
+          hint: "Fill in the missing pronoun",
           prompt: `${german} (${english})`,
           answer: correctForm,
         });
 
-        const distractors = pickDistractors(akkForms, o, [p, o], 3);
+        const distractors = caseDistractors(akkForms, o, [p, o], PERSONS[o].dat);
         out.push({
           category: "Akkusativ",
           type: "mc",
           direction: "en-de",
-          hint: "Choose the missing pronoun (Akkusativ)",
+          hint: "Choose the missing pronoun",
           prompt: `${german} (${english})`,
           answer: correctForm,
           options: [correctForm, ...distractors],
@@ -244,17 +252,17 @@ function buildDatQuestions() {
           category: "Dativ",
           type: "type",
           direction: "en-de",
-          hint: "Fill in the missing pronoun (Dativ)",
+          hint: "Fill in the missing pronoun",
           prompt: `${german} (${english})`,
           answer: correctForm,
         });
 
-        const distractors = pickDistractors(datForms, o, [p, o], 3);
+        const distractors = caseDistractors(datForms, o, [p, o], PERSONS[o].akk);
         out.push({
           category: "Dativ",
           type: "mc",
           direction: "en-de",
-          hint: "Choose the missing pronoun (Dativ)",
+          hint: "Choose the missing pronoun",
           prompt: `${german} (${english})`,
           answer: correctForm,
           options: [correctForm, ...distractors],
@@ -280,17 +288,17 @@ function buildNomQuestions() {
         category: "Nominativ",
         type: "type",
         direction: "en-de",
-        hint: "Fill in the missing pronoun (Nominativ)",
+        hint: "Fill in the missing pronoun",
         prompt: `${german} (${english})`,
         answer: correctForm,
       });
 
-      const distractors = pickDistractors(nomForms, p, [p], 3);
+      const distractors = caseDistractors(nomForms, p, [p], PERSONS[p].akk);
       out.push({
         category: "Nominativ",
         type: "mc",
         direction: "en-de",
-        hint: "Choose the missing pronoun (Nominativ)",
+        hint: "Choose the missing pronoun",
         prompt: `${german} (${english})`,
         answer: correctForm,
         options: [correctForm, ...distractors],
@@ -349,7 +357,7 @@ function buildFutureQuestions() {
           category: "Future (Futur I)",
           type: "type",
           direction: "en-de",
-          hint: "Translate to German (Futur I)",
+          hint: "Translate to German",
           prompt: english,
           answer: german,
           altAnswers: inverted,
